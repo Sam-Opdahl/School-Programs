@@ -14,7 +14,7 @@
 from sys import stdout
 
 # -- Globals --
-INF_SYMBOL = u"\u221E"
+INF_SYMBOL = "*"
 INF = "inf"
 TABLE_ID = "vertex"
 ID_WIDTH = len(TABLE_ID)
@@ -111,11 +111,14 @@ def main():
 			except ValueError:
 				print "Error parsing value \"{0}\" in row {1}, program will now exit.".format(row[j], i + 1)
 				exit()
-			#excluding the infinity value (since it will print in just 1 character),
 			#check if the new value in column j is bigger than the previous biggest value.
 			#note: will only make a difference for formatting when the order of magnitude of the value increases
 			if (v != float(INF) and v > colWidthList[j]):
 				colWidthList[j] = v
+			#if we need to print inf in the table, compare the char count of the infinity symbol to the current
+			#max char count as well.
+			elif (v == float(INF) and len(INF_SYMBOL) > len(str(colWidthList[j]))):
+				colWidthList[j] = 10 ** (len(INF_SYMBOL) - 1)			
 			#replace string value in the row with the new int/infinity value
 			row[j] = v
 		adjacencyMatrix.append(row)
@@ -125,7 +128,8 @@ def main():
 	#get string for separating rows in the table
 	rowSeparator = getRowSeparator(colWidthList)
 	#start printing the adj. matrix
-	print "\n\nAdjacency Matrix:\n"
+	print "\n\nAdjacency Matrix:"
+	print "({0} = infinity)\n".format(INF_SYMBOL)
 	print TABLE_ID,
 	#print the table header
 	for i in range(1, vertexCount + 1):
